@@ -1,4 +1,4 @@
-module ddgosearch
+module github.com/kr4phy/ddgosearch
 
 go 1.26.2
 
