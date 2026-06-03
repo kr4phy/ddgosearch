@@ -1,2 +1,2 @@
 # ddgosearch
-DuckDuckGo Search API written in Go
+Get search results from duckdcukgo in anywhere

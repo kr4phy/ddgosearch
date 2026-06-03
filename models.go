@@ -1,10 +1,10 @@
 package main
 
 type SearchOptions struct {
-	query		string
-	limit		int
-	region		string
-	safeSearch	int
+	query      string
+	limit      int
+	region     string
+	safeSearch int
 }
 
 type SearchResult struct {
@@ -14,8 +14,8 @@ type SearchResult struct {
 	Description string
 }
 
-// type MinimalSearchResult struct {
-// 	Index int
-// 	Title string
-// 	URL   string
-// }
+type MinimalSearchResult struct {
+	Index int
+	Title string
+	URL   string
+}
