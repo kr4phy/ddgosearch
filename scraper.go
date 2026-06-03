@@ -9,19 +9,6 @@ import (
 	"golang.org/x/net/html"
 )
 
-type SearchResult struct {
-	Index       int
-	Title       string
-	URL         string
-	Description string
-}
-
-type MinimalSearchResult struct {
-	Index int
-	Title string
-	URL   string
-}
-
 func extractResultURL(href string) string {
 	u, err := url.Parse("https:" + href)
 	if err != nil {
@@ -129,11 +116,11 @@ func findResultRows(n *html.Node) []*html.Node {
 	return rows
 }
 
-func ScrapeDuckDuckGo(query string, page int, limit int, region string, safeSearch int) ([]SearchResult, error) {
+func ScrapeDuckDuckGo(searchOptions SearchOptions) ([]SearchResult, error) {
 	userAgent := "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
 
-	escapedQuery := url.QueryEscape(query)
-	requestURL := fmt.Sprintf("https://lite.duckduckgo.com/lite/?q=%s&kl=%s&kp=%d", escapedQuery, region, safeSearch)
+	escapedQuery := url.QueryEscape(searchOptions.query)
+	requestURL := fmt.Sprintf("https://lite.duckduckgo.com/lite/?q=%s&kl=%s&kp=%d", escapedQuery, searchOptions.region, searchOptions.safeSearch)
 
 	req, err := http.NewRequest("GET", requestURL, nil)
 	if err != nil {
@@ -156,7 +143,7 @@ func ScrapeDuckDuckGo(query string, page int, limit int, region string, safeSear
 	index := 1
 
 	for _, row := range findResultRows(doc) {
-		if len(results) >= limit {
+		if len(results) >= searchOptions.limit {
 			break
 		}
 
