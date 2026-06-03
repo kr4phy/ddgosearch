@@ -17,7 +17,7 @@ Search DuckDuckGo from your terminal or run a simple HTTP API server with small 
 ### Go Install
 
 ```bash
-go install github.com/kr4phy/ddgosearch@latest
+go install -trimpath -ldflags "-s -w" github.com/kr4phy/ddgosearch@latest
 ```
 
 Make sure your Go bin directory is in your PATH.

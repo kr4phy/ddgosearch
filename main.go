@@ -12,11 +12,10 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
-	"time"
 )
 
 func searchHandler(w http.ResponseWriter, r *http.Request) {
-	log.Printf("%s %s %s %s", time.Now().Format("2006-01-02 15:04:05"), r.RemoteAddr, r.Method, r.URL.Path)
+	log.Printf("%s %s %s", r.RemoteAddr, r.Method, r.URL.Path)
 	query := r.URL.Query().Get("q")
 	limitParam := r.URL.Query().Get("limit")
 	region := r.URL.Query().Get("region")
