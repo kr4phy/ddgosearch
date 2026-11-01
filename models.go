@@ -7,6 +7,14 @@ type SearchOptions struct {
 	safeSearch int
 }
 
+type JSONLRequest struct {
+	Query      string `json:"query"`
+	Limit      int    `json:"limit"`
+	Region     string `json:"region"`
+	SafeSearch *int   `json:"safeSearch"`
+	Quit     bool   `json:"quit"`
+}
+
 type SearchResult struct {
 	Index       int
 	Title       string

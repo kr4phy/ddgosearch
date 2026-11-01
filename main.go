@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -65,17 +66,79 @@ func createAPIServer(port int) (*http.Server, error) {
 	return server, nil
 }
 
+func JSONLStdioMode() {
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Buffer(make([]byte, 4096), 1024*1024)
+
+	encoder := json.NewEncoder(os.Stdout)
+	encoder.SetEscapeHTML(false)
+
+	for scanner.Scan() {
+		var input JSONLRequest
+
+		if err := json.Unmarshal(scanner.Bytes(), &input); err != nil {
+			log.Printf("Invalid JSON: %v", err)
+			continue
+		}
+
+		if input.Quit {
+			log.Println("Received quit signal. Exiting.")
+			break
+		}
+
+		if strings.TrimSpace(input.Query) == "" {
+			log.Println("Missing required field: query")
+			continue
+		}
+
+		if input.Limit <= 0 {
+			input.Limit = 10
+		}
+
+		if input.Region == "" {
+			input.Region = "wt-wt"
+		}
+
+		safeSearch := -1
+		if input.SafeSearch != nil {
+			safeSearch = *input.SafeSearch
+		}
+
+		results, err := ScrapeDuckDuckGo(SearchOptions{
+			query:      input.Query,
+			limit:      input.Limit,
+			region:     input.Region,
+			safeSearch: safeSearch,
+		})
+
+		if err != nil {
+			log.Printf("Search error: %v", err)
+			continue
+		}
+
+		if err := encoder.Encode(results); err != nil {
+			log.Printf("Output error: %v", err)
+			return
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		log.Printf("Input error: %v", err)
+	}
+}
+
 func main() {
 
 	var (
-		limit         int
-		minimalOutput bool
-		region        string
-		safeSearch    int
-		jsonOutput    bool
-		showVersion   bool
-		apiServerMode bool
-		port          int
+		limit          int
+		minimalOutput  bool
+		region         string
+		safeSearch     int
+		jsonOutput     bool
+		showVersion    bool
+		apiServerMode  bool
+		port           int
+		jsonlStdioMode bool
 	)
 
 	flag.BoolVar(&apiServerMode, "api-server", false, "Run as an API server instead of a CLI tool")
@@ -93,7 +156,8 @@ func main() {
 	flag.BoolVar(&jsonOutput, "j", false, "Alias for --json")
 	flag.BoolVar(&showVersion, "version", false, "Print version information and exit")
 	flag.BoolVar(&showVersion, "v", false, "Alias for --version")
-
+	flag.BoolVar(&jsonlStdioMode, "jsonl-stdio", false, "Read JSONL from stdin and output processed results to stdout")
+	flag.BoolVar(&jsonlStdioMode, "js", false, "Alias for --jsonl-stdio")
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "ddgosearch: Get search results from DuckDuckGo in anywhere\n\n")
 		fmt.Fprintf(os.Stderr, "Usage:\n  %s [options] <query>\n\n", os.Args[0])
@@ -118,6 +182,11 @@ func main() {
 			version = info.Main.Version
 		}
 		fmt.Println("ddgosearch version", version)
+		return
+	}
+
+	if jsonlStdioMode {
+		JSONLStdioMode()
 		return
 	}
 
