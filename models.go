@@ -12,7 +12,7 @@ type JSONLRequest struct {
 	Limit      int    `json:"limit"`
 	Region     string `json:"region"`
 	SafeSearch *int   `json:"safeSearch"`
-	Quit     bool   `json:"quit"`
+	Quit       bool   `json:"quit"`
 }
 
 type SearchResult struct {
