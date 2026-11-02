@@ -9,6 +9,7 @@ Search DuckDuckGo from your terminal or run a simple HTTP API server with small 
 * Search DuckDuckGo from the command line
 * JSON output support
 * Lightweight HTTP API server
+* JSONL mode through stdio
 * Minimal dependencies
 * Single static binary
 
@@ -53,6 +54,14 @@ Search endpoint:
 ```text
 GET /api/v1/search?q=golang
 ```
+
+### JSONL mode
+
+```
+ddgosearch -jsonl-stdio
+```
+Use json with `query`, `limit` field and optionally with safesearch option.
+Add json field `quit` with value `true` to exit
 
 ## Philosophy
 
